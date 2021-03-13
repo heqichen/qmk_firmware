@@ -27,6 +27,9 @@ along with this program.	If not, see <http://www.gnu.org/licenses/>.
 #include "matrix.h"
 #include "wait.h"
 
+static inline void selectRow(int rowId);
+static inline void unselectAllRow(void);
+static inline unsigned int readCol(void);
 
 /* matrix state(1:on, 0:off) */
 static matrix_row_t matrix[MATRIX_ROWS];
@@ -53,55 +56,38 @@ void matrix_init(void)
 	// initialize row and col
     for (int y=0; y<MATRIX_ROWS; ++y) matrix[y] = 0;
     // initialize col
-    palSetPadMode(GPIOA, 0, PAL_MODE_INPUT_PULLUP);
-    palSetPadMode(GPIOA, 1, PAL_MODE_INPUT_PULLUP);
-    palSetPadMode(GPIOA, 2, PAL_MODE_INPUT_PULLUP);
-    palSetPadMode(GPIOA, 3, PAL_MODE_INPUT_PULLUP);
-    palSetPadMode(GPIOA, 4, PAL_MODE_INPUT_PULLUP);
-    palSetPadMode(GPIOA, 5, PAL_MODE_INPUT_PULLUP);
-    palSetPadMode(GPIOA, 6, PAL_MODE_INPUT_PULLUP);
-    palSetPadMode(GPIOA, 7, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOB, 6, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOB, 7, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOB, 8, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOB, 9, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOB, 12, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOB, 13, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOB, 14, PAL_MODE_INPUT_PULLUP);
+    palSetPadMode(GPIOB, 15, PAL_MODE_INPUT_PULLUP);
 
 
     // initialize row
-    palSetPadMode(GPIOB, 0, PAL_MODE_OUTPUT_PUSHPULL);
-    palClearPad(GPIOB, 0);
-    palSetPadMode(GPIOB, 1, PAL_MODE_OUTPUT_PUSHPULL);
-    palClearPad(GPIOB, 1);
-    palSetPadMode(GPIOB, 2, PAL_MODE_OUTPUT_PUSHPULL);
-    palClearPad(GPIOB, 2);
-    palSetPadMode(GPIOB, 3, PAL_MODE_OUTPUT_PUSHPULL);
-    palClearPad(GPIOB, 3);
+    unselectAllRow();
 
     wait_ms(500);
     debug_matrix = true;
     xprintf("\r\ninitializing...\r\n");
-	//wait_ms(500);
+	wait_ms(200);
 
 	matrix_init_quantum();
 }
 
 static int count = 0;
-bool pb13 = false;
+
 uint8_t matrix_scan(void){
-    palSetPad(GPIOB, 0); {
-        for (int rowIdx = 0; rowIdx < MATRIX_ROWS; rowIdx++) {
-            if (rowIdx & 1) palSetPad(GPIOB, 1);
-            if (rowIdx & 2) palSetPad(GPIOB, 2);
-            if (rowIdx & 4) palSetPad(GPIOB, 3);
-            wait_ms(1); // wait for status steable
-            int port = palReadPort(GPIOA);
-            matrix[rowIdx] = ~port & 0x00FF;
-            palClearPad(GPIOB, 1);
-            palClearPad(GPIOB, 2);
-            palClearPad(GPIOB, 3);
-        }
-    } palClearPad(GPIOB, 0);
-
-
-
+    for (int y=0; y<7; ++y) {
+        selectRow(y);
+        wait_us(20);
+        matrix[y] = readCol();
+        unselectAllRow();
+    }
     count ++;
-    if (count > 200) {
+    if (count > 50) {
         count = 0;
         for (int y=0; y<MATRIX_ROWS; ++y) {
             for (int x=0; x<MATRIX_COLS; ++x) {
@@ -116,6 +102,86 @@ uint8_t matrix_scan(void){
 }
 
 
+inline void selectRow(int rowId) {
+    switch (rowId) {
+        case (0): {
+            palSetPadMode(GPIOB, 11, PAL_MODE_OUTPUT_PUSHPULL);
+            palClearPad(GPIOB, 11);
+            break;
+        }
+        case (1): {
+            palSetPadMode(GPIOB, 10, PAL_MODE_OUTPUT_PUSHPULL);
+            palClearPad(GPIOB, 10);
+            break;
+        }
+        case (2): {
+            palSetPadMode(GPIOA, 7, PAL_MODE_OUTPUT_PUSHPULL);
+            palClearPad(GPIOA, 7);
+            break;
+        }
+        case (3): {
+            palSetPadMode(GPIOA, 6, PAL_MODE_OUTPUT_PUSHPULL);
+            palClearPad(GPIOA, 6);
+            break;
+        }
+        case (4): {
+            palSetPadMode(GPIOA, 5, PAL_MODE_OUTPUT_PUSHPULL);
+            palClearPad(GPIOA, 5);
+            break;
+        }
+        case (5): {
+            palSetPadMode(GPIOA, 4, PAL_MODE_OUTPUT_PUSHPULL);
+            palClearPad(GPIOA, 4);
+            break;
+        }
+        case (6): {
+            palSetPadMode(GPIOA, 3, PAL_MODE_OUTPUT_PUSHPULL);
+            palClearPad(GPIOA, 3);
+            break;
+        }
+        case (7): {
+            palSetPadMode(GPIOA, 2, PAL_MODE_OUTPUT_PUSHPULL);
+            palClearPad(GPIOA, 2);
+            break;
+        }
+        default: {
+            break;
+        }
+    }
+}
+
+static inline void unselectAllRow(void) {
+    palSetPadMode(GPIOA, 2, PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPad(GPIOA, 2);
+    palSetPadMode(GPIOA, 3, PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPad(GPIOA, 3);
+    palSetPadMode(GPIOA, 4, PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPad(GPIOA, 4);
+    palSetPadMode(GPIOA, 5, PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPad(GPIOA, 5);
+    palSetPadMode(GPIOA, 6, PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPad(GPIOA, 6);
+    palSetPadMode(GPIOA, 7, PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPad(GPIOA, 7);
+    palSetPadMode(GPIOB, 10, PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPad(GPIOB, 10);
+    palSetPadMode(GPIOB, 11, PAL_MODE_OUTPUT_PUSHPULL);
+    palSetPad(GPIOB, 11);
+}
+
+static int PORT_MAP[8] = {12, 13, 14, 15, 6, 7, 8, 9};
+
+static inline unsigned int readCol(void) {
+    unsigned int val = palReadPort(GPIOB);
+    unsigned int ret = 0;
+
+    for (int x=0; x<8; ++x) {
+        if (val & (1<<PORT_MAP[x])) ret |= (1<<x);
+    }
+    return ~ret;
+}
+
+
 inline bool matrix_is_on(uint8_t row, uint8_t col){
 	return (matrix[row] & ((matrix_row_t)1<<col));
 }
@@ -124,6 +190,5 @@ inline bool matrix_is_on(uint8_t row, uint8_t col){
 inline matrix_row_t matrix_get_row(uint8_t row){
 	return matrix[row];
 }
-
 
 

@@ -94,11 +94,8 @@
  * PA15 USB_DISC
  */
 
-// #define VAL_GPIOACRL            0x44444444      /*  PA7...PA0 */
-// #define VAL_GPIOACRH            0x388BB444      /* PA15...PA8 */
-// #define VAL_GPIOAODR            0xFFFFFFFF
-#define VAL_GPIOACRL            0x88884B88      /*  PA7...PA0 */
-#define VAL_GPIOACRH            0x888884B8      /* PA15...PA8 */
+#define VAL_GPIOACRL            0x33333344      /*  PA7...PA0 */
+#define VAL_GPIOACRH            0x388BB444      /* PA15...PA8 */
 #define VAL_GPIOAODR            0xFFFFFFFF
 /*
  * Port B setup.
@@ -108,8 +105,8 @@
  * PB8 PB9 IIC
  * PB10 - PB15 LED
  */
-#define VAL_GPIOBCRL            0x4B333333      /*  PB7...PB0 */
-#define VAL_GPIOBCRH            0x88888388      /* PB15...PB8 */
+#define VAL_GPIOBCRL            0x88888888      /*  PB7...PB0 */
+#define VAL_GPIOBCRH            0x88883388      /* PB15...PB8 */
 #define VAL_GPIOBODR            0xFFFFFFFF
 
 /*

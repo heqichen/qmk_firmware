@@ -68,3 +68,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 // Iso fix for Space Cadet, comment for ANSI layouts
 #define LSPO_KEY KC_8
 #define RSPC_KEY KC_9
+
+// mouse configuration
+#define MOUSEKEY_INTERVAL 10
+#define MOUSEKEY_MOVE_DELTA 1
+#define MOUSEKEY_MAX_SPEED 5
+#define MOUSEKEY_WHEEL_MAX_SPEED 5
+#define MOUSEKEY_WHEEL_TIME_TO_MAX 100
+
