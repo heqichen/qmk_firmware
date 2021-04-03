@@ -1,0 +1,15 @@
+{
+  "env": {
+  },
+	"configurations": [{
+		"includePath": [
+			//"${workspaceFolder}", "${workspaceFolder}/include"
+			"/mnt/d/heqichen/projects/keyboard/qmk_firmware/lib/chibios/os/nil/include",
+			"/mnt/d/heqichen/projects/keyboard/qmk_firmware/lib/chibios/os/hal/include",
+			// "/mnt/d/heqichen/projects/keyboard/qmk_firmware/"
+			"/mnt/d/heqichen/projects/keyboard/qmk_firmware/lib/chibios/os/hal/osal/nil"
+		]
+
+	}],
+	"version": 4
+}

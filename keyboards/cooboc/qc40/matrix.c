@@ -26,6 +26,8 @@ along with this program.	If not, see <http://www.gnu.org/licenses/>.
 #include "util.h"
 #include "matrix.h"
 #include "wait.h"
+#include "buzzer.h"
+#include "debounce.h"
 
 static inline void selectRow(int rowId);
 static inline void unselectAllRow(void);
@@ -53,6 +55,7 @@ void matrix_print(void){
 
 void matrix_init(void)
 {
+    // hardware initialization
 	// initialize row and col
     for (int y=0; y<MATRIX_ROWS; ++y) matrix[y] = 0;
     // initialize col
@@ -69,15 +72,23 @@ void matrix_init(void)
     // initialize row
     unselectAllRow();
 
+    // debounce initiazlize
+
+    debounceInit();
+
     wait_ms(500);
     debug_matrix = true;
     xprintf("\r\ninitializing...\r\n");
+    toneStop();
 	wait_ms(200);
 
 	matrix_init_quantum();
+
 }
 
 static int count = 0;
+
+extern uint8_t debounceCount[MATRIX_ROWS][sizeof(matrix_row_t)*8];
 
 uint8_t matrix_scan(void){
     for (int y=0; y<7; ++y) {
@@ -86,12 +97,14 @@ uint8_t matrix_scan(void){
         matrix[y] = readCol();
         unselectAllRow();
     }
+    debounceTick(matrix);
+
     count ++;
-    if (count > 50) {
+    if (count > 150) {
         count = 0;
         for (int y=0; y<MATRIX_ROWS; ++y) {
             for (int x=0; x<MATRIX_COLS; ++x) {
-                xprintf("%c ", (matrix[y]&(1<<x) ? '1' : '0'));
+                xprintf("%d ", (int)debounceCount[y][x]);
             }
             xprintf("\r\n");
         }
@@ -183,12 +196,12 @@ static inline unsigned int readCol(void) {
 
 
 inline bool matrix_is_on(uint8_t row, uint8_t col){
-	return (matrix[row] & ((matrix_row_t)1<<col));
+    return debouncedIsKeyOn(row, col);
 }
 
 
 inline matrix_row_t matrix_get_row(uint8_t row){
-	return matrix[row];
+    return debouncedGetRow(row);
 }
 
 

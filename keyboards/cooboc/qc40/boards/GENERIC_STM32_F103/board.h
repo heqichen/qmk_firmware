@@ -95,7 +95,7 @@
  */
 
 #define VAL_GPIOACRL            0x33333344      /*  PA7...PA0 */
-#define VAL_GPIOACRH            0x388BB444      /* PA15...PA8 */
+#define VAL_GPIOACRH            0x388BB44B      /* PA15...PA8 */
 #define VAL_GPIOAODR            0xFFFFFFFF
 /*
  * Port B setup.
