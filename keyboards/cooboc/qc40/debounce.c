@@ -6,11 +6,15 @@
 static matrix_row_t lastStatus[MATRIX_ROWS];
 uint8_t debounceCount[MATRIX_ROWS][sizeof(matrix_row_t)*8];
 
+static int modulationStatus = 0;
+
 static void keyFlapped(uint8_t row, uint8_t col);
 static void printKeyStatus(uint8_t keyid, bool status);
 static void freqModulation(uint8_t keyid, bool status);
 static void morseModulation(uint8_t keyid, bool status);
 static void pushTone(const char *code);
+static inline void magicKeyTick(uint8_t keyid, bool status);
+
 
 void debounceInit(void) {
     for (size_t y=0; y<MATRIX_ROWS; ++y) {
@@ -47,7 +51,6 @@ inline bool debouncedIsKeyOn(uint8_t row, uint8_t col) {
     return (lastStatus[row] & ((matrix_row_t)1<<col));
 }
 
-
 inline matrix_row_t debouncedGetRow(uint8_t row) {
     return lastStatus[row];
 }
@@ -57,8 +60,15 @@ static inline void keyFlapped(uint8_t row, uint8_t col) {
     bool status = (lastStatus[row] & ((matrix_row_t)1 << col)) != 0;
 
     printKeyStatus(keyid, status);
-    // freqModulation(keyid, status);
-    morseModulation(keyid, status);
+
+    switch (modulationStatus) {
+        case (0): break;
+        case (1): { freqModulation(keyid, status); break; }
+        case (2): { morseModulation(keyid, status); break; }
+        default: { modulationStatus = 0;  break; }
+    }
+
+    magicKeyTick(keyid, status);
 }
 
 static inline void printKeyStatus(uint8_t keyid, bool status) {
@@ -142,5 +152,34 @@ static void pushTone(const char *code) {
 }
 
 
+static inline void magicKeyTick(uint8_t keyid, bool status) {
+    static bool keyStatus[4] = {0, 0, 0, 0};
+    static int cycle = 0;
+    // 0 4 11 14
+    if (keyid == 0 || keyid == 4 || keyid == 11 || keyid == 14) {
+        switch (keyid) {
+            case (0): { keyStatus[0]=status; break; }
+            case (4): { keyStatus[1]=status; break; }
+            case (11): { keyStatus[2]=status; break; }
+            case (14): { keyStatus[3]=status; break; }
+            default: break;
+        }
+        if (cycle % 2 == 0) {
+            if (keyStatus[0] && keyStatus[1] && keyStatus[2] && keyStatus[3]) cycle++;
+        } else {
+            if (!(keyStatus[0] || keyStatus[1] || keyStatus[2] || keyStatus[3])) cycle++;
+        }
+        if (cycle == 6) {
+            cycle = 0;
+            modulationStatus ++;
+            modulationStatus %= 3;
+        }
+    } else { // reset all
+        keyStatus[0] = keyStatus[1] = keyStatus[2] = keyStatus[3] = false;
+        cycle = 0;
+    }
+
+
+}
 
 
