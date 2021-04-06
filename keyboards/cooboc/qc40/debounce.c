@@ -72,7 +72,8 @@ static inline void keyFlapped(uint8_t row, uint8_t col) {
 }
 
 static inline void printKeyStatus(uint8_t keyid, bool status) {
-    xprintf("%d %s\r\n", (int)(keyid), status?"pressed":"released");
+
+    // xprintf("%d %s\r\n", (int)(keyid), status?"pressed":"released");
 }
 
 

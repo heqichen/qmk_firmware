@@ -78,7 +78,7 @@ void matrix_init(void)
 
     wait_ms(500);
     debug_matrix = true;
-    xprintf("\r\ninitializing...\r\n");
+    // xprintf("\r\ninitializing...\r\n");
     toneStop();
 	wait_ms(200);
 
@@ -86,7 +86,7 @@ void matrix_init(void)
 
 }
 
-static int count = 0;
+// static int count = 0;
 
 extern uint8_t debounceCount[MATRIX_ROWS][sizeof(matrix_row_t)*8];
 
@@ -99,6 +99,7 @@ uint8_t matrix_scan(void){
     }
     debounceTick(matrix);
 
+    /*
     count ++;
     if (count > 150) {
         count = 0;
@@ -110,6 +111,7 @@ uint8_t matrix_scan(void){
         }
         xprintf("\r\n");
     }
+    */
     matrix_scan_quantum();
     return 1;
 }
