@@ -111,6 +111,7 @@ static void select_row(uint8_t row) {
 
 
 static uint16_t start_time;
+static uint8_t ledIdxMapping[12] = {0, 7, 8, 1, 6, 9, 2, 5, 10, 3, 4, 11};
 
 void matrix_init(void) {
     start_time = timer_read();
@@ -126,21 +127,15 @@ void matrix_init(void) {
     qc_debounce_init();
 
     matrix_init_quantum();
-
-    rgblight_setrgb(RGB_OFF);
-
-    wait_ms(300);
-    for (int i=0; i<RGBLED_NUM; ++i) {
-        // sethsv(HSV_WHITE, (LED_TYPE *)&led[i]);
-        // rgblight_setrgb_at(RGB_GOLD, i);
-    }
-    // rgblight_setrgb(RGB_OFF);
-    // rgblight_set();
 }
 
 static uint16_t lastPrintTime = 0;
 
+static bool isAlreadyStartup = false;
+
+
 uint8_t matrix_scan(void) {
+
 
     if (timer_read() - start_time > 120000) {
         bootloader_jump();
@@ -150,6 +145,8 @@ uint8_t matrix_scan(void) {
         matrix_print();
         lastPrintTime = timer_read();
     }
+
+
 
 
     bool changed = false;
@@ -166,9 +163,39 @@ uint8_t matrix_scan(void) {
         bootloader_jump();
     }
 
+    // show led
+    uint16_t running_time = timer_read() - start_time;
+    const uint16_t STAGE_PERIOD = 200;
+    if (isAlreadyStartup || running_time > 3*STAGE_PERIOD) {
+        // show according the key
+        // rgblight_setrgb_at(0, 0, 0, 0);
+        for (int r=0; r<4; ++r) {
+            for (int c=0; c<3; ++c) {
+                if (qc_debounce_get_row(r) & (1<<c)) {
+                    rgblight_setrgb_at(50, 50, 50, ledIdxMapping[(r*3+c)]);
+                    // print("keyidx: ", r*4 + c);
+                } else {
+                    rgblight_setrgb_at(0, 0, 0, ledIdxMapping[(r*3+c)]);
+                }
+            }
+        }
+        isAlreadyStartup = true;
+    } else if (running_time > 2*STAGE_PERIOD) {
+        // rgblight_setrgb_at(0, 0, 50, 0);
+        rgblight_setrgb(0, 0, 50);
+    } else if (running_time > STAGE_PERIOD) {
+        // rgblight_setrgb_at(0, 50, 0, 0);
+        rgblight_setrgb(0, 50, 0);
+    } else if (running_time > 0) {
+        // rgblight_setrgb_at(50, 0, 0, 0);
+        rgblight_setrgb(50, 0, 0);
+    }
+
+
 
 
     matrix_scan_quantum();
+
 
     return (uint8_t)changed;
 }
