@@ -159,7 +159,8 @@ uint8_t matrix_scan(void) {
     }
     unselect_rows();
 
-    if (qc_debounce_get_row(3) & (1<<2)) {
+
+    if (qc_debounce_get_row(3) & (1<<1)) {
         bootloader_jump();
     }
 

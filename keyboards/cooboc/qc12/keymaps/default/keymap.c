@@ -13,6 +13,7 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
 
 
 bool encoder_update_user(uint8_t index, bool clockwise) {
+
     switch (index) {
         case (0): {
             tap_code(clockwise ? KC_A: KC_B);
@@ -23,7 +24,11 @@ bool encoder_update_user(uint8_t index, bool clockwise) {
             break;
         }
         case (2): {
-            tap_code(clockwise ? KC_E: KC_F);
+            if (clockwise) {
+                tap_code(KC_B);
+            }
+            tap_code(KC_ENTER);
+
             break;
         }
         default: {
