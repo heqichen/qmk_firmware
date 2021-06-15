@@ -47,4 +47,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #define TAPPING_TERM 200
 
+
+/* Encoder */
+#define ENCODERS_PAD_A { E6, F5, B2 }
+#define ENCODERS_PAD_B { F0, F6, B3 }
+#define ENCODER_RESOLUTIONS { 4, 4, 4 }
+
 #endif
