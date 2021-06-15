@@ -136,10 +136,11 @@ static bool isAlreadyStartup = false;
 
 uint8_t matrix_scan(void) {
 
-
+    /*
     if (timer_read() - start_time > 120000) {
         bootloader_jump();
     }
+    */
 
     if (timer_read() - lastPrintTime > 500) {
         matrix_print();
@@ -159,10 +160,11 @@ uint8_t matrix_scan(void) {
     }
     unselect_rows();
 
-
+    /*
     if (qc_debounce_get_row(3) & (1<<1)) {
         bootloader_jump();
     }
+    */
 
     // show led
     uint16_t running_time = timer_read() - start_time;
